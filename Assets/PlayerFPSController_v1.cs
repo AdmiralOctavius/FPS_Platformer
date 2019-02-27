@@ -13,11 +13,14 @@ public class PlayerFPSController_v1 : MonoBehaviour {
     public float horizontalSpeed = 2.0f;
     public float verticalSpeed = -2.0f;
     public GameObject playerCamera;
+    public GameObject firePoint;
 
     // Use this for initialization
     void Start () {
-		
-	}
+
+        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
+    }
 
     // Update is called once per frame
     void Update()
@@ -44,5 +47,30 @@ public class PlayerFPSController_v1 : MonoBehaviour {
 
         transform.Rotate(0, mouseXaxis, 0);
         playerCamera.GetComponent<Transform>().transform.Rotate(mouseYaxis, 0, 0);
+
+
+        if (Input.GetAxis("Vertical") != 0)
+        {
+            Debug.Log("Moving forward or backward");
+            
+            this.GetComponent<Rigidbody>().AddRelativeForce(new Vector3(0, 0, verticalSpeed));
+        }
+        if(Input.GetAxis("Horizontal") != 0)
+        {
+            Debug.Log("Moving left or Right");
+            this.GetComponent<Rigidbody>().AddRelativeForce(new Vector3(horizontalSpeed, 0, 0));
+        }
+
+        if(Input.GetAxis("Fire1") > 0)
+        {
+            Debug.Log("Firing");
+            firePoint.GetComponent<Transform>().forward
+            if(Physics.Raycast(firePoint.transform,firePoint.GetComponent<Transform>().forward, 5f))
+            {
+
+            }
+            
+        }
+
     }  
 }
