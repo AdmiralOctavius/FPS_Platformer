@@ -15,6 +15,9 @@ public class PlayerFPSController_v1 : MonoBehaviour {
     public GameObject playerCamera;
     public GameObject firePoint;
 
+    //Ver2 variables
+    public float currentview;
+
     // Use this for initialization
     void Start () {
 
@@ -46,28 +49,47 @@ public class PlayerFPSController_v1 : MonoBehaviour {
         mouseYaxis = verticalSpeed * Input.GetAxis("Mouse Y");
 
         transform.Rotate(0, mouseXaxis, 0);
-        playerCamera.GetComponent<Transform>().transform.Rotate(mouseYaxis, 0, 0);
-
+        //playerCamera.GetComponent<Transform>().transform.Rotate(mouseYaxis, 0, 0);
+        //playerCamera.GetComponent<Transform>().transform.localEulerAngles.y 
+        currentview = Mathf.Clamp(mouseYaxis, -60, 60);
+        playerCamera.GetComponent<Transform>().transform.localEulerAngles.x = Mathf.Clamp(mouseYaxis, -60, 60);
+        playerCamera.GetComponent<Transform>().transform.Rotate(currentview, 0, 0);
 
         if (Input.GetAxis("Vertical") != 0)
         {
             Debug.Log("Moving forward or backward");
+            if(Input.GetAxis("Vertical") > 0)
+            {
+                this.GetComponent<Rigidbody>().AddRelativeForce(new Vector3(0, 0, verticalSpeed));
+            }
+            else
+            {
+                this.GetComponent<Rigidbody>().AddRelativeForce(new Vector3(0, 0, -verticalSpeed));
+            }
             
-            this.GetComponent<Rigidbody>().AddRelativeForce(new Vector3(0, 0, verticalSpeed));
         }
         if(Input.GetAxis("Horizontal") != 0)
         {
             Debug.Log("Moving left or Right");
             this.GetComponent<Rigidbody>().AddRelativeForce(new Vector3(horizontalSpeed, 0, 0));
+
+            if (Input.GetAxis("Horizontal") > 0)
+            {
+                this.GetComponent<Rigidbody>().AddRelativeForce(new Vector3(horizontalSpeed, 0, 0));
+            }
+            else
+            {
+                this.GetComponent<Rigidbody>().AddRelativeForce(new Vector3(-horizontalSpeed, 0, 0));
+            }
         }
 
         if(Input.GetAxis("Fire1") > 0)
         {
             Debug.Log("Firing");
-            firePoint.GetComponent<Transform>().forward
-            if(Physics.Raycast(firePoint.transform,firePoint.GetComponent<Transform>().forward, 5f))
+            //firePoint.GetComponent<Transform>()
+            if(Physics.Raycast(firePoint.GetComponent<Transform>().localPosition,firePoint.GetComponent<Transform>().forward, 5f))
             {
-
+                Debug.Log("Got spot on wall");
             }
             
         }
