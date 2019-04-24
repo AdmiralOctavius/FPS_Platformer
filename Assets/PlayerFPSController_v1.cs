@@ -23,6 +23,11 @@ public class PlayerFPSController_v1 : MonoBehaviour {
     public float explosionForceVar;
     public float explosionRadius;
 
+    //Ver4 Variables
+    //Was a big dummy and needed new speed variables for mouse movement
+    public float horizontalMouseSpeed = 2.0f;
+    public float verticalMouseSpeed = -2.0f;
+    //Starting gravity is Y -9.81
     // Use this for initialization
     void Start () {
 
@@ -31,7 +36,7 @@ public class PlayerFPSController_v1 : MonoBehaviour {
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
         //This is move code
         //Pulled from: https://docs.unity3d.com/ScriptReference/Input.GetAxis.html
@@ -50,8 +55,8 @@ public class PlayerFPSController_v1 : MonoBehaviour {
 
 
         // Get the mouse delta. This is not in the range -1...1
-        mouseXaxis = horizontalSpeed * Input.GetAxis("Mouse X");
-        mouseYaxis = verticalSpeed * Input.GetAxis("Mouse Y");
+        mouseXaxis = horizontalMouseSpeed * Input.GetAxis("Mouse X");
+        mouseYaxis = verticalMouseSpeed * Input.GetAxis("Mouse Y");
 
         transform.Rotate(0, mouseXaxis, 0);
         //playerCamera.GetComponent<Transform>().transform.Rotate(mouseYaxis, 0, 0);
@@ -125,7 +130,8 @@ public class PlayerFPSController_v1 : MonoBehaviour {
             if(Physics.Raycast(firePoint.GetComponent<Transform>().localPosition,firePoint.GetComponent<Transform>().forward, out fireCast, 10f))
             {
                 Debug.Log("Got spot on wall");
-                Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.forward) * fireCast.distance, Color.yellow);
+                //Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.forward) * fireCast.distance, Color.yellow);
+                Debug.DrawRay(firePoint.GetComponent<Transform>().localPosition, firePoint.GetComponent<Transform>().forward * fireCast.distance, Color.yellow);
                 Debug.Log(fireCast.distance);
                 if (fireCast.distance <= 7f)
                 {
@@ -135,6 +141,12 @@ public class PlayerFPSController_v1 : MonoBehaviour {
                 
             }
             
+        }
+
+        if(Input.GetButtonDown("Jump"))
+        {
+            Debug.Log("Got Jump");
+            this.GetComponent<Rigidbody>().AddRelativeForce(new Vector3(0, jumpForce, 0));
         }
 
     }  
