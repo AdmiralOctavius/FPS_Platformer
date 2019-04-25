@@ -1,4 +1,14 @@
-﻿using System.Collections;
+﻿/**
+ * Oh my god I actually found good reference material!
+ * https://flafla2.github.io/2015/02/14/bunnyhop.html
+ * https://github.com/WiggleWizard/quake3-movement-unity3d
+ * https://www.reddit.com/r/QuakeChampions/comments/7uqiwy/help_understanding_all_the_movement_mechanics/
+ * https://i.imgur.com/hiT2qPm.png
+ * https://www.youtube.com/watch?v=gpir6ZZKmcM
+ * * 
+ * 
+ * **/
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -29,6 +39,15 @@ public class PlayerFPSController_v1 : MonoBehaviour {
     public float verticalMouseSpeed = -2.0f;
     //Starting gravity is Y -9.81
     // Use this for initialization
+
+    //Ver5 Variables
+    public bool jumping = false;
+    public float fallSpeedForce;
+    public float inAirHorizontalMoveSpeed;
+    public float inAirVerticalMoveSpeed;
+    public float VerticalWalkingSpeed;
+    public float HorizontalWalkingSpeed;
+
     void Start () {
 
         Cursor.visible = false;
@@ -38,6 +57,12 @@ public class PlayerFPSController_v1 : MonoBehaviour {
     // Update is called once per frame
     void FixedUpdate()
     {
+        Debug.Log(this.GetComponent<Rigidbody>().velocity.ToString());
+        if(jumping == true)
+        {
+            Debug.Log("Added Downward Force");
+            this.GetComponent<Rigidbody>().AddRelativeForce(new Vector3(0, fallSpeedForce, 0));
+        }
         //This is move code
         //Pulled from: https://docs.unity3d.com/ScriptReference/Input.GetAxis.html
 
@@ -100,11 +125,30 @@ public class PlayerFPSController_v1 : MonoBehaviour {
             Debug.Log("Moving forward or backward");
             if(Input.GetAxis("Vertical") > 0)
             {
-                this.GetComponent<Rigidbody>().AddRelativeForce(new Vector3(0, 0, verticalSpeed));
+                if(jumping == false)
+                {
+                    this.GetComponent<Rigidbody>().AddRelativeForce(new Vector3(0, 0, verticalSpeed));
+                    //this.GetComponent<Transform>().position = new Vector3(0,0, this.GetComponent<Transform>().position.y + VerticalWalkingSpeed);
+                    this.GetComponent<Rigidbody>().velocity = new Vector3(0, 0, verticalSpeed);
+                }
+                else
+                {
+                    this.GetComponent<Rigidbody>().AddRelativeForce(new Vector3(0, 0, inAirVerticalMoveSpeed));
+                }
+                
             }
             else
             {
-                this.GetComponent<Rigidbody>().AddRelativeForce(new Vector3(0, 0, -verticalSpeed));
+                if(jumping == false)
+                {
+                    this.GetComponent<Rigidbody>().AddRelativeForce(new Vector3(0, 0, -verticalSpeed));
+                    //this.GetComponent<Transform>().position = new Vector3(0, 0, this.GetComponent<Transform>().position.y + -VerticalWalkingSpeed);
+                    //this.GetComponent<Rigidbody>().velocity = new Vector3(0, 0, -verticalSpeed);
+                }
+                else
+                {
+                    this.GetComponent<Rigidbody>().AddRelativeForce(new Vector3(0, 0, -inAirVerticalMoveSpeed));
+                }
             }
             
         }
@@ -115,11 +159,29 @@ public class PlayerFPSController_v1 : MonoBehaviour {
 
             if (Input.GetAxis("Horizontal") > 0)
             {
-                this.GetComponent<Rigidbody>().AddRelativeForce(new Vector3(horizontalSpeed, 0, 0));
+                if(jumping == false)
+                {
+                    this.GetComponent<Rigidbody>().AddRelativeForce(new Vector3(horizontalSpeed, 0, 0));
+                    //this.GetComponent<Transform>().position = new Vector3(this.GetComponent<Transform>().position.x + HorizontalWalkingSpeed, 0, 0);
+                    this.GetComponent<Rigidbody>().velocity = new Vector3(horizontalSpeed, 0, 0);
+                }
+                else
+                {
+                    this.GetComponent<Rigidbody>().AddRelativeForce(new Vector3(inAirHorizontalMoveSpeed, 0, 0));
+                }
             }
             else    
             {
-                this.GetComponent<Rigidbody>().AddRelativeForce(new Vector3(-horizontalSpeed, 0, 0));
+                if(jumping == false)
+                {
+                    //this.GetComponent<Rigidbody>().AddRelativeForce(new Vector3(-horizontalSpeed, 0, 0));
+                    //this.GetComponent<Transform>().position = new Vector3(this.GetComponent<Transform>().position.x + -HorizontalWalkingSpeed, 0, 0);
+                    this.GetComponent<Rigidbody>().velocity = new Vector3(-horizontalSpeed, 0, 0);
+                }
+                else
+                {
+                    this.GetComponent<Rigidbody>().AddRelativeForce(new Vector3(-inAirHorizontalMoveSpeed, 0, 0));
+                }
             }
         }
 
@@ -145,9 +207,21 @@ public class PlayerFPSController_v1 : MonoBehaviour {
 
         if(Input.GetButtonDown("Jump"))
         {
-            Debug.Log("Got Jump");
-            this.GetComponent<Rigidbody>().AddRelativeForce(new Vector3(0, jumpForce, 0));
+            if(jumping == false)
+            {
+                Debug.Log("Got Jump");
+                this.GetComponent<Rigidbody>().AddRelativeForce(new Vector3(0, jumpForce, 0));
+                jumping = true;
+            }
         }
 
     }  
+
+    void OnCollisionEnter(Collision collision)
+    {
+        if(collision.gameObject.tag == "ground")
+        {
+            jumping = false;
+        }
+    }
 }
